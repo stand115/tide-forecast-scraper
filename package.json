@@ -1,0 +1,16 @@
+{
+  "name": "tide-forecast-scraper",
+  "private": false,
+  "scripts": {
+    "start": "nodemon src/index.js"
+  },
+  "devDependencies": {
+    "nodemon": "^1.12.1"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "express": "^4.15.4",
+    "fs": "0.0.1-security",
+    "request": "^2.87.0"
+  }
+}
