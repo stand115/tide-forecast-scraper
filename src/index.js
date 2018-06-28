@@ -12,10 +12,10 @@ app.set("json spaces", 3);
 app.get("/scrape", (req, res) => {
   let output = {};
   // call the scrape function for each location and return the output object in response
-  scrape("Half-Moon-Bay-California", output, function(data) {
-    scrape("Huntington-Beach", output, function(data) {
-      scrape("Wrightsville-Beach-North-Carolina", output, function(data) {
-        scrape("Providence-Rhode-Island", output, function(data) {
+  scrape("Half-Moon-Bay-California", output, () => {
+    scrape("Huntington-Beach", output, () => {
+      scrape("Wrightsville-Beach-North-Carolina", output, () => {
+        scrape("Providence-Rhode-Island", output, () => {
           res.json(output);
         });
       });
@@ -43,6 +43,7 @@ let scrape = (location, output, cb) => {
       // data rows exist in the in the tbody element, that's what we'll traverse
       $("tbody")
         .children()
+        // traverse each row in the table body
         .each(function(i, el) {
           // capture the date from parent row when for each day in the table
           if (
