@@ -9,16 +9,18 @@ const port = 4000;
 app.set("json spaces", 3);
 
 // we'll use the /scrape endpoint to trigger the web scraper
-app.get("/scrape", function(req, res) {
+app.get("/scrape", (req, res) => {
   let output = {};
-
   // call the scrape function for each location and return the output object in response
-  scrape("Half-Moon-Bay-California", output);
-  scrape("Huntington-Beach", output);
-  scrape("Providence-Rhode-Island", output);
-  scrape("Wrightsville-Beach-North-Carolina", output);
-
-  res.json(output);
+  scrape("Half-Moon-Bay-California", output, function(data) {
+    scrape("Huntington-Beach", output, function(data) {
+      scrape("Wrightsville-Beach-North-Carolina", output, function(data) {
+        scrape("Providence-Rhode-Island", output, function(data) {
+          res.json(output);
+        });
+      });
+    });
+  });
 });
 
 app.listen(port, () => {
@@ -26,13 +28,13 @@ app.listen(port, () => {
 });
 
 // helper function to make requests to forecast site and extract data
-let scrape = (location, output) => {
-  // initiale array to contain low tide date, format url
+let scrape = (location, output, cb) => {
+  // initialize array to contain low tide date, format url
   output[location] = [];
   let url = `https://www.tide-forecast.com/locations/${location}/tides/latest`;
   let date = "";
 
-  request(url, function(error, response, html) {
+  request(url, (error, response, html) => {
     if (!error) {
       let $ = cheerio.load(html);
       // use this to toggle when we're in and out of daylight
@@ -42,6 +44,18 @@ let scrape = (location, output) => {
       $("tbody")
         .children()
         .each(function(i, el) {
+          // capture the date from parent row when for each day in the table
+          if (
+            $(this)
+              .children(".date")
+              .text().length
+          ) {
+            date = $(this)
+              .children(".date")
+              .text()
+              .toString();
+          }
+
           // toggle daylight on when sunrise is found
           if (
             $(this)
@@ -61,7 +75,27 @@ let scrape = (location, output) => {
           ) {
             daylight = false;
           }
+
+          // check for low tide row and during daylight, push to location array when found
+          if (
+            $(this)
+              .children(".tide")
+              .text()
+              .indexOf("Low Tide") > -1 &&
+            daylight
+          ) {
+            output[location].push({
+              date: date,
+              time: $(this)
+                .children(".time")
+                .text(),
+              height: $(this)
+                .children(".metric")
+                .text()
+            });
+          }
         });
+      cb(output);
     }
   });
 };
