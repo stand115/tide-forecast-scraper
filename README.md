@@ -11,7 +11,7 @@ Huntington Beach, California
 Providence, Rhode Island
 Wrightsville Beach, North Carolina
 
-The forecast page for each location is loaded, and information on low tides (date, time, height) on low tides that occur after sunrise and before sunset is extracted.
+The forecast page for each location is loaded, and information on low tides (date, time, height) that occur after sunrise and before sunset is extracted.
 
 ### Setup Environment
 
